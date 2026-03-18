@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Expenses - Campus Canteen</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <link rel="icon" href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+    <rect width='100' height='100' rx='18' fill='%231a1a2e'/>
+    <text x='50%' y='60%' font-size='58' text-anchor='middle' fill='%23f5a623'>🍱</text>
+    </svg>">
+
+    <link rel="stylesheet" href="menu.css">
+
+    <style>
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .metric-label {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0.5rem 0;
+        }
+
+        .metric-change {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .metric-change.positive {
+            color: #10b981;
+        }
+
+        .metric-change.negative {
+            color: #ef4444;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .dark .metric-card {
+            background: #1f2937;
+        }
+
+        .dark .metric-value {
+            color: white;
+        }
+
+        .dark .metric-label {
+            color: #d1d5db;
+        }
+
+        .dark .chart-container {
+            background: #1f2937;
+        }
+
+        .dark .chart-title {
+            color: white;
+            border-bottom-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .filters-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .dark .filters-bar {
+            background: #1f2937;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .filter-btn:hover {
+            border-color: rgba(102, 126, 234, 0.8);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-lg">
+        <div class="container">
+
+            <!-- Logo -->
+            <a class="navbar-brand fw-bold text-white" href="index.html">
+                🍽 CanteenSys
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+
+                    <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                    </li>
+
+                    <li class="nav-item">
+                    <a class="nav-link" href="menu.html">Menu</a>
+                    </li>
+
+                    <li class="nav-item">
+                    <a class="nav-link" href="about.html">About</a>
+                    </li>
+
+                    <li class="nav-item">
+                    <a class="nav-link" href="feedback.html">Feedback</a>
+                    </li>
+
+                    <li class="nav-item">
+                    <a class="nav-link" href="analytics.html">Analytics</a>
+                    </li>
+
+                    <li class="nav-item">
+                    <a class="nav-link" href="cart.html">
+                    🛒 Cart (<span id="cart-count">0</span>)
+                    </a>
+                    </li>
+
+                    <li class="nav-item">
+                    <a class="nav-link" href="auth.html">
+                    🔐 Login
+                    </a>
+                    </li>
+
+                    <!-- Theme Button -->
+                    <li class="nav-item ms-2">
+                    <button class="btn btn-warning btn-sm" onclick="toggleTheme()">
+                     🌙
+                    </button>
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero py-5">
+        <div class="container">
+            <h1 class="display-4 fw-bold">📊 Analytics & Expenses</h1>
+            <p class="lead mt-3">Track revenue, expenses, and profit performance</p>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <div class="container mt-5 mb-5">
+
+        <!-- Key Metrics -->
+        <h2 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700; margin-bottom: 2rem;">Key Performance Indicators</h2>
+        
+        <div class="summary-grid">
+            <div class="metric-card">
+                <div class="metric-label">💰 Total Revenue</div>
+                <div class="metric-value" id="totalRevenue">₹ 0</div>
+                <div class="metric-change positive">↑ 12% from last month</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">📉 Total Expenses</div>
+                <div class="metric-value" id="totalExpenses">₹ 0</div>
+                <div class="metric-change negative">↓ -5% cost reduction</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">📈 Net Profit</div>
+                <div class="metric-value" id="netProfit">₹ 0</div>
+                <div class="metric-change positive">↑ 18% improvement</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">💹 Profit Margin</div>
+                <div class="metric-value" id="profitMargin">0%</div>
+                <div class="metric-change positive">↑ Strong performance</div>
+            </div>
+        </div>
+
+        <!-- Detailed Table -->
+        <div class="chart-container">
+            <div class="chart-title">📋 Monthly Breakdown</div>
+            <div style="overflow-x: auto;">
+                <table class="table table-hover" style="margin: 0;">
+                    <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <tr>
+                            <th>Month</th>
+                            <th>Revenue</th>
+                            <th>Food Costs</th>
+                            <th>Labor</th>
+                            <th>Utilities</th>
+                            <th style="border-right: 2px solid rgba(255,255,255,0.2);">Total Expenses</th>
+                            <th style="color: #10b981; font-weight: 700;">Net Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 2rem; color: white; margin-top: 2rem; text-align: center;">
+            <h3 style="color: white; margin-bottom: 1.5rem;">Financial Summary</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                <div>
+                    <p style="opacity: 0.9; margin-bottom: 0.5rem;">Avg Monthly Revenue</p>
+                    <p style="font-size: 1.8rem; font-weight: 700;" id="avgRevenue">₹ 0</p>
+                </div>
+                <div>
+                    <p style="opacity: 0.9; margin-bottom: 0.5rem;">Avg Monthly Expenses</p>
+                    <p style="font-size: 1.8rem; font-weight: 700;" id="avgExpenses">₹ 0</p>
+                </div>
+                <div>
+                    <p style="opacity: 0.9; margin-bottom: 0.5rem;">Avg Monthly Profit</p>
+                    <p style="font-size: 1.8rem; font-weight: 700; color: #10b981;" id="avgProfit">₹ 0</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer py-5 text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>Campus Canteen</h5>
+                    <p>Your trusted food destination on campus since 2016.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="menu.html">Menu</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="feedback.html">Feedback</a></li>
+                        <li><a href="analytics.html">Analytics</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+          <li><a href="auth.html">Login</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Contact</h5>
+                    <p>📍 Main Campus | 📞 9876543210 | ✉️ info@canteen.edu</p>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <small>© 2026 Campus Canteen · All rights reserved</small>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 🔢 Update Cart Count
+        function updateCartCount() {
+            let cartData = JSON.parse(localStorage.getItem("cart")) || [];
+            document.querySelectorAll("#cart-count").forEach(el => {
+                el.innerText = cartData.length;
+            });
+        }
+
+        // 🌙 Theme Toggle + Save
+        function toggleTheme() {
+            document.body.classList.toggle("dark");
+
+            if (document.body.classList.contains("dark")) {
+                localStorage.setItem("theme", "dark");
+            } else {
+                localStorage.setItem("theme", "light");
+            }
+        }
+
+        // 🌙 Apply saved theme on load
+        function loadTheme() {
+            let theme = localStorage.getItem("theme");
+
+            if (theme === "dark") {
+                document.body.classList.add("dark");
+            }
+        }
+
+        // 📊 Sample Data (12 months)
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        const analyticsData = {
+            months: monthNames,
+            revenue: [45000, 48000, 52000, 55000, 58000, 61000, 65000, 62000, 59000, 64000, 68000, 72000],
+            foodCosts: [15000, 16000, 17500, 18000, 19000, 19500, 20000, 19000, 18500, 20000, 21000, 21500],
+            labor: [12000, 12000, 12500, 12500, 13000, 13000, 13500, 13500, 13000, 13500, 14000, 14000],
+            utilities: [3000, 3000, 3200, 3200, 3300, 3300, 3400, 3400, 3300, 3500, 3600, 3600],
+        };
+
+        // Calculate totals and averages
+        function calculateMetrics() {
+            const totalRevenue = analyticsData.revenue.reduce((a, b) => a + b, 0);
+            const totalFoodCosts = analyticsData.foodCosts.reduce((a, b) => a + b, 0);
+            const totalLabor = analyticsData.labor.reduce((a, b) => a + b, 0);
+            const totalUtilities = analyticsData.utilities.reduce((a, b) => a + b, 0);
+            const totalExpenses = totalFoodCosts + totalLabor + totalUtilities;
+            const netProfit = totalRevenue - totalExpenses;
+            const profitMargin = ((netProfit / totalRevenue) * 100).toFixed(1);
+
+            document.getElementById('totalRevenue').textContent = '₹ ' + totalRevenue.toLocaleString();
+            document.getElementById('totalExpenses').textContent = '₹ ' + totalExpenses.toLocaleString();
+            document.getElementById('netProfit').textContent = '₹ ' + netProfit.toLocaleString();
+            document.getElementById('profitMargin').textContent = profitMargin + '%';
+            document.getElementById('avgRevenue').textContent = '₹ ' + (totalRevenue / 12).toLocaleString('en-IN', {maximumFractionDigits: 0});
+            document.getElementById('avgExpenses').textContent = '₹ ' + (totalExpenses / 12).toLocaleString('en-IN', {maximumFractionDigits: 0});
+            document.getElementById('avgProfit').textContent = '₹ ' + (netProfit / 12).toLocaleString('en-IN', {maximumFractionDigits: 0});
+
+            return { totalRevenue, totalExpenses, netProfit, totalFoodCosts, totalLabor, totalUtilities };
+        }
+
+        // 📋 Populate Table
+        function initTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            analyticsData.months.forEach((month, idx) => {
+                const revenue = analyticsData.revenue[idx];
+                const foodCosts = analyticsData.foodCosts[idx];
+                const labor = analyticsData.labor[idx];
+                const utilities = analyticsData.utilities[idx];
+                const expenses = foodCosts + labor + utilities;
+                const profit = revenue - expenses;
+
+                const row = `
+                    <tr>
+                        <td><strong>${month}</strong></td>
+                        <td>₹ ${revenue.toLocaleString()}</td>
+                        <td>₹ ${foodCosts.toLocaleString()}</td>
+                        <td>₹ ${labor.toLocaleString()}</td>
+                        <td>₹ ${utilities.toLocaleString()}</td>
+                        <td><strong>₹ ${expenses.toLocaleString()}</strong></td>
+                        <td style="color: #10b981; font-weight: 700;">₹ ${profit.toLocaleString()}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // Initialize all charts and data
+        function initAllCharts() {
+            calculateMetrics();
+            initTable();
+        }
+
+        // Run on load
+        updateCartCount();
+        loadTheme();
+        initAllCharts();
+    </script>
+</body>
+</html>

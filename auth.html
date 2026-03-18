@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Campus Canteen</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="icon" href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+    <rect width='100' height='100' rx='18' fill='%231a1a2e'/>
+    <text x='50%' y='60%' font-size='58' text-anchor='middle' fill='%23f5a623'>🍱</text>
+    </svg>">
+
+    <link rel="stylesheet" href="menu.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auth-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 2.5rem;
+            max-width: 450px;
+            width: 100%;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .auth-card h2 {
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: clamp(1.5rem, 5vw, 2rem);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .toggle-auth {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .toggle-auth a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .toggle-auth a:hover {
+            text-decoration: underline;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .site-footer {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin-top: auto;
+        }
+
+        .dark .auth-card {
+            background: #1f2937;
+            color: white;
+        }
+
+        .dark .auth-card h2 {
+            color: white;
+        }
+
+        .dark .form-group label {
+            color: #e5e7eb;
+        }
+
+        .dark .form-group input {
+            background: #374151;
+            border-color: #4b5563;
+            color: white;
+        }
+
+        .dark .form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+        .dark .form-group input:focus {
+            border-color: #667eea;
+        }
+
+        .dark .toggle-auth {
+            color: #d1d5db;
+        }
+
+        @media (max-width: 576px) {
+            .auth-card {
+                padding: 1.5rem;
+            }
+
+            .auth-card h2 {
+                margin-bottom: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-lg">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-white" href="index.html">
+                🍽 CanteenSys
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="menu.html">Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="feedback.html">Feedback</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="analytics.html">Analytics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cart.html">
+                            🛒 Cart (<span id="cart-count">0</span>)
+                        </a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <button class="btn btn-warning btn-sm" onclick="toggleTheme()">
+                            🌙
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- AUTH CONTAINER -->
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- SUCCESS MESSAGE -->
+            <div class="success-message" id="successMessage">
+                ✓ Account created successfully! You can now login.
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="loginForm" class="form-section active">
+                <h2>🔐 Login</h2>
+                
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                    <div class="error-message" id="loginEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    <div class="error-message" id="loginPasswordError"></div>
+                </div>
+
+                <button type="button" class="btn-auth" onclick="handleLogin()">Login</button>
+
+                <div class="toggle-auth">
+                    Don't have an account? <a onclick="toggleForm()">Sign Up</a>
+                </div>
+            </form>
+
+            <!-- SIGNUP FORM -->
+            <form id="signupForm" class="form-section">
+                <h2>📝 Sign Up</h2>
+
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" placeholder="Enter your full name" required>
+                    <div class="error-message" id="signupNameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupEmail">Email Address</label>
+                    <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                    <div class="error-message" id="signupEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPhone">Phone Number</label>
+                    <input type="tel" id="signupPhone" placeholder="Enter your phone number" required>
+                    <div class="error-message" id="signupPhoneError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" placeholder="Create a strong password" required>
+                    <div class="error-message" id="signupPasswordError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" placeholder="Re-enter your password" required>
+                    <div class="error-message" id="signupConfirmPasswordError"></div>
+                </div>
+
+                <button type="button" class="btn-auth" onclick="handleSignup()">Sign Up</button>
+
+                <div class="toggle-auth">
+                    Already have an account? <a onclick="toggleForm()">Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer py-5 text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>Campus Canteen</h5>
+                    <p>Fast, affordable, and delicious meals for every student.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="menu.html">Menu</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="feedback.html">Feedback</a></li>
+                        <li><a href="analytics.html">Analytics</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Contact</h5>
+                    <p>📍 Main Campus | 📞 9876543210 | ✉️ info@canteen.edu</p>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <small>© 2026 Campus Canteen · All rights reserved</small>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 🌙 Theme Toggle
+        function toggleTheme() {
+            document.body.classList.toggle("dark");
+            if (document.body.classList.contains("dark")) {
+                localStorage.setItem("theme", "dark");
+            } else {
+                localStorage.setItem("theme", "light");
+            }
+        }
+
+        // 🌙 Load saved theme
+        function loadTheme() {
+            let theme = localStorage.getItem("theme");
+            if (theme === "dark") {
+                document.body.classList.add("dark");
+            }
+        }
+
+        // 🔄 Update Cart Count
+        function updateCartCount() {
+            let cartData = JSON.parse(localStorage.getItem("cart")) || [];
+            document.querySelectorAll("#cart-count").forEach(el => {
+                el.innerText = cartData.length;
+            });
+        }
+
+        // 🔀 Toggle between Login and Signup
+        function toggleForm() {
+            document.getElementById("loginForm").classList.toggle("active");
+            document.getElementById("signupForm").classList.toggle("active");
+            clearAllErrors();
+        }
+
+        // ❌ Clear all error messages
+        function clearAllErrors() {
+            document.querySelectorAll(".error-message").forEach(el => {
+                el.style.display = "none";
+                el.textContent = "";
+            });
+        }
+
+        // ✅ Show error message
+        function showError(fieldId, message) {
+            const errorEl = document.getElementById(fieldId + "Error");
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = "block";
+            }
+        }
+
+        // 📝 Handle Signup
+        function handleSignup() {
+            clearAllErrors();
+
+            const name = document.getElementById("signupName").value.trim();
+            const email = document.getElementById("signupEmail").value.trim();
+            const phone = document.getElementById("signupPhone").value.trim();
+            const password = document.getElementById("signupPassword").value;
+            const confirmPassword = document.getElementById("signupConfirmPassword").value;
+
+            let isValid = true;
+
+            // Validation
+            if (!name || name.length < 3) {
+                showError("signupName", "Name must be at least 3 characters long");
+                isValid = false;
+            }
+
+            if (!email || !email.includes("@")) {
+                showError("signupEmail", "Please enter a valid email address");
+                isValid = false;
+            }
+
+            if (!phone || phone.length < 10) {
+                showError("signupPhone", "Please enter a valid phone number");
+                isValid = false;
+            }
+
+            if (!password || password.length < 6) {
+                showError("signupPassword", "Password must be at least 6 characters long");
+                isValid = false;
+            }
+
+            if (password !== confirmPassword) {
+                showError("signupConfirmPassword", "Passwords do not match");
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            // Check if user already exists
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+            if (users.find(u => u.email === email)) {
+                showError("signupEmail", "This email is already registered");
+                return;
+            }
+
+            // Save new user
+            users.push({
+                id: Date.now(),
+                name: name,
+                email: email,
+                phone: phone,
+                password: password, // Note: In production, use proper encryption
+                createdAt: new Date().toISOString()
+            });
+
+            localStorage.setItem("users", JSON.stringify(users));
+
+            // Show success message and switch to login
+            document.getElementById("successMessage").style.display = "block";
+            setTimeout(() => {
+                document.getElementById("signupForm").classList.remove("active");
+                document.getElementById("loginForm").classList.add("active");
+                document.getElementById("successMessage").style.display = "none";
+                document.getElementById("loginEmail").value = email;
+                document.getElementById("loginPassword").value = "";
+            }, 2000);
+        }
+
+        // 🔐 Handle Login
+        function handleLogin() {
+            clearAllErrors();
+
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = document.getElementById("loginPassword").value;
+
+            if (!email || !email.includes("@")) {
+                showError("loginEmail", "Please enter a valid email address");
+                return;
+            }
+
+            if (!password || password.length < 6) {
+                showError("loginPassword", "Please enter your password");
+                return;
+            }
+
+            // Find user
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+            let user = users.find(u => u.email === email && u.password === password);
+
+            if (!user) {
+                showError("loginPassword", "Invalid email or password");
+                return;
+            }
+
+            // Save logged-in user
+            localStorage.setItem("currentUser", JSON.stringify(user));
+
+            // Show success and redirect
+            alert("✓ Login successful! Welcome, " + user.name);
+            window.location.href = "menu.html";
+        }
+
+        // Initialize on page load
+        updateCartCount();
+        loadTheme();
+    </script>
+</body>
+
+</html>

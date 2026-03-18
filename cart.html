@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="icon" href="data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+<rect width='100' height='100' rx='18' fill='%231a1a2e'/>
+<text x='50%' y='60%' font-size='58' text-anchor='middle' fill='%23f5a623'>🍱</text>
+</svg>">
+
+    <link rel="stylesheet" href="menu.css">
+
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-lg">
+  <div class="container">
+
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold text-warning" href="index.html">
+      🍽 CanteenSys
+    </a>
+
+    <!-- Mobile Toggle -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Home</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="menu.html">Menu</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">About</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="feedback.html">Feedback</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="analytics.html">Analytics</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="cart.html">
+            🛒 Cart (<span id="cart-count">0</span>)
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="auth.html">
+            🔐 Login
+          </a>
+        </li>
+
+        <!-- Theme Button -->
+        <li class="nav-item ms-2">
+          <button class="btn btn-warning btn-sm" onclick="toggleTheme()">
+            🌙
+          </button>
+        </li>
+
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
+<section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center; color: white;">
+    <h2 style="font-size: clamp(1.8rem, 4vw, 2.3rem); font-weight: 700; margin: 0;">Shopping Cart</h2>
+    <p style="margin: 10px 0 0 0; opacity: 0.95;">Review and manage your food orders</p>
+</section>
+
+<div class="container mt-5">
+
+    <div id="cart-items" class="mt-4"></div>
+
+    <h3 class="text-end mt-4" style="font-weight: 600; font-size: 1.3rem;">Total: <span id="total" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">₹0</span></h3>
+
+    <div class="text-center mt-4 mb-4" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <button class="btn btn-success" onclick="placeOrder()" style="padding: 12px 40px; font-weight: 600; font-size: 1.05rem; border-radius: 50px; box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);">✓ Place Order</button>
+        <button class="btn btn-danger" onclick="clearCart()" style="padding: 12px 40px; font-weight: 600; font-size: 1.05rem; border-radius: 50px; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);">🗑️ Clear Cart</button>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer py-5 text-white">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <h5>Campus Canteen</h5>
+        <p>Fast, affordable, and delicious meals for every student.</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h5>Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="feedback.html">Feedback</a></li>
+          <li><a href="analytics.html">Analytics</a></li>
+          <li><a href="cart.html">Cart</a></li>
+          <li><a href="auth.html">Login</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h5>Contact</h5>
+        <p>📍 Main Campus | 📞 9876543210 | ✉️ info@canteen.edu</p>
+      </div>
+    </div>
+    <div class="text-center mt-3">
+      <small>© 2026 Campus Canteen · All rights reserved</small>
+    </div>
+  </div>
+</footer>
+
+<!-- Success Modal -->
+<div id="successModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 20px; padding: 2.5rem; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.4s ease-out;">
+        <div style="font-size: 4rem; margin-bottom: 1rem; animation: scaleIn 0.6s ease-out;">✓</div>
+        <h2 style="color: #10b981; font-weight: 700; margin-bottom: 1rem;">Order Successfully Placed!</h2>
+        <p style="color: #6b7280; font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.6;">Your delicious meal will be ready soon. Thank you for ordering from Campus Canteen!</p>
+        
+        <div style="background: #f3f4f6; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: left;">
+            <p style="margin: 0.5rem 0; color: #1f2937;"><strong>Order ID:</strong> <span id="orderId" style="color: #667eea; font-weight: 600;">ORD-2026001</span></p>
+            <p style="margin: 0.5rem 0; color: #1f2937;"><strong>Total Amount:</strong> <span id="orderTotal" style="color: #10b981; font-weight: 600;">₹0</span></p>
+            <p style="margin: 0.5rem 0; color: #1f2937;"><strong>Estimated Time:</strong> <span style="color: #f5576c; font-weight: 600;">15-20 minutes</span></p>
+        </div>
+
+        <button onclick="closeOrderModal()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 40px; border-radius: 50px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);">Continue Shopping</button>
+    </div>
+</div>
+
+<style>
+    @keyframes slideUp {
+        from {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+        }
+        to {
+            transform: scale(1);
+        }
+    }
+
+    #successModal[style*="display: flex"] {
+        display: flex !important;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 🔢 Update Cart Count
+    function updateCartCount() {
+        let cartData = JSON.parse(localStorage.getItem("cart")) || [];
+        document.querySelectorAll("#cart-count").forEach(el => {
+            el.innerText = cartData.length;
+        });
+    }
+
+    // 🌙 Theme Toggle + Save
+    function toggleTheme() {
+        document.body.classList.toggle("dark");
+
+        if (document.body.classList.contains("dark")) {
+            localStorage.setItem("theme", "dark");
+        } else {
+            localStorage.setItem("theme", "light");
+        }
+    }
+
+    // 🌙 Apply saved theme on load
+    function loadTheme() {
+        let theme = localStorage.getItem("theme");
+
+        if (theme === "dark") {
+            document.body.classList.add("dark");
+        }
+    }
+
+    // 📦 Place Order Function
+    function placeOrder() {
+        let cartData = JSON.parse(localStorage.getItem("cart")) || [];
+        
+        if (cartData.length === 0) {
+            alert("⚠️ Your cart is empty! Add some items before placing an order.");
+            return;
+        }
+
+        // Calculate total
+        let total = 0;
+        cartData.forEach(item => {
+            total += item.price * item.quantity;
+        });
+
+        // Generate Order ID
+        const orderId = "ORD-" + Date.now().toString().slice(-6);
+        
+        // Show success modal
+        document.getElementById("orderId").textContent = orderId;
+        document.getElementById("orderTotal").textContent = "₹" + total.toLocaleString();
+        document.getElementById("successModal").style.display = "flex";
+
+        // Store order in history
+        let orders = JSON.parse(localStorage.getItem("orders")) || [];
+        orders.push({
+            orderId: orderId,
+            items: cartData,
+            total: total,
+            date: new Date().toISOString(),
+            status: "Processing"
+        });
+        localStorage.setItem("orders", JSON.stringify(orders));
+
+        // Clear cart after order
+        setTimeout(() => {
+            localStorage.removeItem("cart");
+            updateCartCount();
+        }, 1000);
+    }
+
+    // ❌ Close Modal
+    function closeOrderModal() {
+        document.getElementById("successModal").style.display = "none";
+        // Redirect to menu page
+        location.href = "menu.html";
+    }
+
+    // Run on load
+    updateCartCount();
+    loadTheme();
+</script>
+<script src="cart.js"></script>
+</body>
+</html>
